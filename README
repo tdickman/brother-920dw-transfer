@@ -1,0 +1,11 @@
+Transfers files from the Brother DS-920DW to a local directory, and performs OCR on documents. This was quick and dirty, but it works for me. Hopefully you find it useful.
+
+Usage:
+
+python download.py
+
+Dependencies:
+-tesseract-ocr
+-ghostscript
+-PyPDFOCR
+-imagemagick
