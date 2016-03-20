@@ -4,20 +4,20 @@ import urllib
 from os import walk
 from pypdfocr import pypdfocr
 import os
+import sys
 
 
 class Download:
     def __init__(self):
-        pass
+        self.p = pypdfocr.PyPDFOCR()
+        self.p.lang = 'eng'
+        self.p.debug = False
+        self.p._setup_external_tools()
 
     def find_files(self):
         r = requests.get('http://10.10.100.1/:sda1/DCIM:.xml:Document:Sub')
         data = r.text.replace('<![CDATA[', '').replace(']]>', '')
         tree = ElementTree.fromstring(data)
-        self.p = pypdfocr.PyPDFOCR()
-        self.p.lang = 'eng'
-        self.p.debug = False
-        self.p._setup_external_tools()
 
         files = []
         for child in tree.findall('.//Document'):
@@ -40,7 +40,7 @@ class Download:
             dest_file = "files/{}".format(file['name'])
             get_it = urllib.URLopener()
             get_it.retrieve("http://10.10.100.1/{}".format(file['path']), dest_file)
-            self.ocr(dest_file)
+            # self.ocr(dest_file)
 
     def ocr(self, original_filename):
         self.p.run_conversion(original_filename)
@@ -51,5 +51,11 @@ class Download:
 
 if __name__ == "__main__":
     d = Download()
-    for file in d.find_files():
-        d.download_file(file)
+    if len(sys.argv) > 1:
+        path = "."
+        for (dirpath, dirnames, filenames) in os.walk(path):
+            for filename in filenames:
+                d.ocr(filename)
+    else:
+        for file in d.find_files():
+            d.download_file(file)
